@@ -1,0 +1,43 @@
+agent:
+  name: anomalib_train
+  description: "Agent to perform Cflow model training."
+
+templates:
+- template_name: InputTemplate
+  class_name: InputTemplate
+  attributes: {}
+
+- template_name: CflowTrain
+  class_name: CflowTrain
+  template_input: InputTemplate
+  attributes:
+    generic_key: CflowTrain
+    folder_attributes:
+      name: "visa_pcb1"
+      root: "artifacts/VisA/pcb1/Data"
+      normal_dir: "Images/Normal"
+      abnormal_dir: "Images/Anomaly"
+      #OPTIONAL: mask_dir: "Masks/Anomaly"
+      extensions: [".jpg", ".png", ".JPG", ".PNG"]
+      train_batch_size: 1
+      eval_batch_size: 1
+      num_workers: 0
+      test_split_mode: "from_dir"
+      test_split_ratio: 0.2
+      val_split_mode: "from_test"
+      val_split_ratio: 0.5
+      seed: 42
+    normalization: "min_max"
+    threshold: "F1AdaptiveThreshold"
+    image_metrics: ["AUROC", "F1Score"]
+    pixel_metrics: ["AUROC", "F1Score"]
+    default_root_dir: "artifacts/train"
+    callback_configs:
+      model_checkpoint:
+        monitor: "train_loss"
+        save_top_k: 1
+        mode: "min"
+        dirpath: "artifacts/train/checkpoints"
+        filename: "model-{epoch:02d}-{val_loss:.2f}"
+    cflow_init:
+      lr: 0.0001

@@ -1,0 +1,48 @@
+agent:
+  name: anomalib_inference
+  description: "Agent to perform OV segmentation to a set of images loaded from a local directory."
+
+templates:
+- template_name: InputTemplate
+  class_name: InputTemplate
+  attributes: {}
+
+- template_name: ImageReader
+  class_name: FolderImageDatasetCV2
+  template_input: InputTemplate
+  attributes:
+    data_dir: "artifacts/test-data"
+    batch_size: 10
+    samples_to_load: 10
+
+- template_name: AnomalibOpenVINOInference
+  class_name: AnomalibOpenVINOInference
+  template_input: ImageReader
+  attributes:
+    model_path: "artifacts/exported_models/weights/openvino/model.xml"
+    device: "CPU"
+    model_height: 512
+    model_width: 512
+
+- template_name: BBoxDrawer
+  class_name: BBoxDrawer
+  template_input:  AnomalibOpenVINOInference
+  attributes:
+    randomized_color: false
+    draw_classification_label: false
+
+- template_name: SegmentationMaskDrawer
+  class_name: SegmentationMaskDrawer
+  template_input: BBoxDrawer
+  attributes:
+    overwrite: true
+    randomized_color: false
+    draw_classification_label: false
+
+- template_name: ImageSaver
+  class_name: ImageSaver
+  template_input: SegmentationMaskDrawer
+  attributes:
+    save_dir: "inference_images-ov"
+    root_dir: "artifacts"
+    extension: png

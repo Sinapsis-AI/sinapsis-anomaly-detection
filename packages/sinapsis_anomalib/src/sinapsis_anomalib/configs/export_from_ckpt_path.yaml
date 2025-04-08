@@ -1,0 +1,19 @@
+agent:
+  name: anomalib_export
+  description: "Agent to export a Cflow model to openvino format."
+
+templates:
+- template_name: InputTemplate
+  class_name: InputTemplate
+  attributes: {}
+
+- template_name: CflowExport
+  class_name: CflowExport
+  template_input: InputTemplate
+  attributes:
+    generic_key: "CflowExport"
+    ckpt_path: "artifacts/train/Cflow/visa_pcb1/v0/weights/lightning/model.ckpt"
+    export_type: "openvino" # or "torch"
+    export_root: "artifacts/exported_models/"
+    cflow_init:
+      lr: 0.0001

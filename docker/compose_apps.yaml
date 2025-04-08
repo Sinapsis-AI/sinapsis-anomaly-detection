@@ -1,0 +1,21 @@
+services:
+  sinapsis-anomalib-inference:
+    extends:
+      file: compose.yaml
+      service: sinapsis-anomalib-main
+    container_name: sinapsis-anomalib-inference
+    environment:
+      AGENT_CONFIG_PATH: "/app/configs/inference/torch_demo.yml"
+      TRAINING_CONFIG: "/app/configs/train_export.yaml"
+      MODEL_PATH: "/app/artifacts/exported_models/weights/torch/model.pt"
+    volumes:
+      - "~/.cache/torch:/root/.cache/torch"
+      - "../packages/sinapsis_anomalib/src/sinapsis_anomalib/configs:/app/configs/"
+      - "../webapps/:/app/webapps"
+      - "../artifacts/:/app/artifacts"
+
+  sinapsis-anomalib-gradio:
+    extends:
+      service: sinapsis-anomalib-inference
+    container_name: sinapsis-anomalib-gradio
+    command: python3 webapps/anomalib_gradio_app.py

@@ -1,0 +1,64 @@
+[project]
+name = "sinapsis-anomalib"
+version = "0.1.0"
+description = "Templates for anomaly detection with computer vision using anomalib library."
+authors = [
+    {name = "SinapsisAI", email = "dev@sinapsis.tech"},
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.10"
+
+dependencies = [
+    "torch<=2.5.1",
+    "einops>=0.8.0",
+    "freia>=0.2",
+    "imgaug>=0.4.0",
+    "kornia>=0.7.4",
+    "lightning>=2.4.0",
+    "matplotlib==3.9.0",
+    "nncf>=2.14.0",
+    "numpy==1.26.4",
+    "onnx>=1.17.0",
+    "opencv-python>=4.10.0.84",
+    "openvino>=2024.5.0",
+    "pandas>=2.2.3",
+    "psutil>=6.1.0",
+    "scikit-learn>=1.5.2",
+    "sinapsis>=0.1.1",
+    "dotenv>=0.9.9",
+    "anomalib>=2.0.0",
+    "torchvision>=0.20.1",
+    "timm>=1.0.15",
+    "open-clip-torch>=2.31.0",
+]
+
+[project.optional-dependencies]
+
+vlm = [
+    "python-dotenv>=1.0.1",
+    "transformers>=4.45.0",
+    "openai>=1.50.0",
+    "ollama>=0.4.7",
+]
+
+loggers = [
+    "comet>=3.1.0",
+    "mlflow>=2.19.0",
+    "tensorboard>=2.18.0",
+    "wandb>=0.19.1",
+]
+
+all = [
+    "sinapsis-anomalib[vlm, loggers]",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+Homepage = "https://sinapsis.tech"
+Documentation = "https://docs.sinapsis.tech/docs"
+Tutorials = "https://docs.sinapsis.tech/tutorials"
+Repository = "https://github.com/Sinapsis-AI/sinapsis-anomaly-detection.git"

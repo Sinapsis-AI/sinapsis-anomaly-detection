@@ -1,0 +1,46 @@
+agent:
+  name: anomalib_train_export
+  description: "Agent to train and export to Torch format a segmentation Cflow model."
+
+templates:
+- template_name: InputTemplate
+  class_name: InputTemplate
+  attributes: {}
+
+- template_name: CflowTrain
+  class_name: CflowTrain
+  template_input: InputTemplate
+  attributes:
+    folder_attributes:
+      name: "concrete_crack"
+      root: "artifacts/data/train_data"
+      normal_dir: "images/normal"
+      abnormal_dir: "images/anomaly"
+      #OPTIONAL: mask_dir: "Masks/Anomaly"
+      extensions: [".jpg", ".png", ".JPG", ".PNG"]
+      train_batch_size: 4
+      eval_batch_size: 4
+      num_workers: 2
+      test_split_mode: "from_dir"
+      test_split_ratio: 0.2
+      val_split_mode: "from_test"
+      val_split_ratio: 0.5
+      seed: 42
+    default_root_dir: "artifacts/train"
+    max_epochs: 5
+    accelerator: gpu
+    trainer_args:
+      devices: [0]
+    cflow_init:
+      lr: 0.0001
+
+- template_name: CflowExport
+  class_name: CflowExport
+  template_input: CflowTrain
+  attributes:
+    generic_key_chkpt: CflowTrain
+    input_size: [512, 512]
+    export_type: "torch" # or "openvino"
+    export_root: "artifacts/exported_models/"
+    cflow_init:
+      lr: 0.0001
