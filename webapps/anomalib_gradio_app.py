@@ -5,8 +5,7 @@ import gradio as gr
 from sinapsis.webapp.agent_gradio_helper import (
     add_logo_and_title,
     css_header,
-    infer_image,
-    lambda_init_agent,
+    init_image_inference,
 )
 from sinapsis_core.cli.run_agent_from_config import generic_agent_builder
 from sinapsis_core.data_containers.data_packet import DataContainer
@@ -56,48 +55,6 @@ def train_model() -> None:
     _ = agent(container)
 
 
-def init_image_inference(
-    config_path: str,
-    title: str | None = None,
-    stream: bool = False,
-    image_input: gr.Image | None = gr.Image,
-    app_message: str | None = None,
-) -> gr.Interface:
-    """Method to perform inference on the input from gradio.
-
-    Args:
-        config_path (str): Path to config file for the agent
-        title (str | None, optional): Title of the gradio app.
-        stream (bool, optional): Whether to consume a single image (False) or a video (True).
-            Defaults to False.
-        image_input (gr.Image | None, optional): Whether the app takes an input image or not.
-            Defaults to gr.Image.
-        app_message (str | None, optional): The message that shows up in the interface when starting it.
-            Defaults to None.
-
-    Returns:
-        gr.Interface: Gradio interface customized for anomalib inference demo.
-    """
-    input_sources = ["webcam"]
-    if not stream:
-        input_sources.append("upload")
-    fn = lambda_init_agent(infer_image, config_path)
-    if image_input:
-        image_input = [gr.Image(sources=input_sources, streaming=stream)]
-
-    live_interface = gr.Interface(
-        fn,
-        inputs=image_input,
-        outputs=gr.Image(type="pil"),
-        live=True,
-        title=title,
-        flagging_mode="never",
-        article=app_message,
-        examples=EXAMPLES_LIST,
-    )
-    return live_interface
-
-
 def create_demo() -> gr.Blocks:
     """Creates a Gradio interface.
 
@@ -107,7 +64,7 @@ def create_demo() -> gr.Blocks:
     with gr.Blocks(css=css_header(), title="Sinapsis Anomalib Inference") as demo_app:
         add_logo_and_title("Sinapsis Anomalib Inference")
 
-        init_image_inference(CONFIG_FILE)
+        init_image_inference(CONFIG_FILE, examples=EXAMPLES_LIST)
 
     return demo_app
 
