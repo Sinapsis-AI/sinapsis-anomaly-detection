@@ -2,7 +2,7 @@ services:
   sinapsis-anomalib-inference:
     extends:
       file: compose.yaml
-      service: sinapsis-anomalib-main
+      service: sinapsis-anomaly-detection-main
     container_name: sinapsis-anomalib-inference
     environment:
       AGENT_CONFIG_PATH: "/app/configs/inference/torch_demo.yml"
