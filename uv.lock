@@ -3793,7 +3793,7 @@ requires-dist = [
     { name = "freia", specifier = ">=0.2" },
     { name = "imgaug", specifier = ">=0.4.0" },
     { name = "kornia", specifier = ">=0.7.4" },
-    { name = "lightning", specifier = ">=2.4.0" },
+    { name = "lightning", specifier = ">=2.4.1" },
     { name = "matplotlib", specifier = "==3.9.0" },
     { name = "mlflow", marker = "extra == 'loggers'", specifier = ">=2.19.0" },
     { name = "nncf", specifier = ">=2.14.0" },

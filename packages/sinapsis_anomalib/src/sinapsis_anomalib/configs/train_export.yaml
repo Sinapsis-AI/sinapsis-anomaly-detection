@@ -15,7 +15,7 @@ templates:
       name: "concrete_crack"
       root: "artifacts/data/train_data"
       normal_dir: "images/normal"
-      abnormal_dir: "images/anomaly"
+      abnormal_dir: "images/anomaly" 
       #OPTIONAL: mask_dir: "Masks/Anomaly"
       extensions: [".jpg", ".png", ".JPG", ".PNG"]
       train_batch_size: 4

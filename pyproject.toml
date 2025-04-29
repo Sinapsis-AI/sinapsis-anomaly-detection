@@ -38,6 +38,7 @@ exclude = ["packages/*.egg-info"]
 [tool.setuptools]
 packages = { find = { where = ["packages"] } }
 
+
 [tool.uv.sources]
 sinapsis-anomalib = {workspace= true}
 
