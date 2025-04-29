@@ -6,7 +6,7 @@ authors = [
     {name = "SinapsisAI", email = "dev@sinapsis.tech"},
 ]
 readme = "README.md"
-license = {file = "LICENSE"}
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
    "sinapsis>=0.1.1",
@@ -37,7 +37,6 @@ exclude = ["packages/*.egg-info"]
 
 [tool.setuptools]
 packages = { find = { where = ["packages"] } }
-license-files = []
 
 [tool.uv.sources]
 sinapsis-anomalib = {workspace= true}
