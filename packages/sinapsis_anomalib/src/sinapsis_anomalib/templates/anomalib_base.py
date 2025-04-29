@@ -13,7 +13,7 @@ from lightning.pytorch.loggers import Logger
 from pydantic import BaseModel, ConfigDict
 from pydantic.dataclasses import dataclass
 from sinapsis_core.data_containers.data_packet import DataContainer
-from sinapsis_core.template_base import TemplateAttributes, TemplateAttributeType
+from sinapsis_core.template_base.base_models import TemplateAttributes, TemplateAttributeType
 from sinapsis_core.template_base.dynamic_template import BaseDynamicWrapperTemplate, WrapperEntryConfig
 
 from sinapsis_anomalib.helpers.config_factory import CallbackFactory, LoggerFactory

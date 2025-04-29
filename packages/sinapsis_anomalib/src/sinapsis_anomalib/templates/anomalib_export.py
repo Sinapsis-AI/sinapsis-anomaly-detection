@@ -5,7 +5,8 @@ from typing import Any
 from anomalib.deploy import CompressionType, ExportType
 from pydantic.dataclasses import dataclass
 from sinapsis_core.data_containers.data_packet import DataContainer
-from sinapsis_core.template_base import Template, TemplateAttributeType
+from sinapsis_core.template_base import Template
+from sinapsis_core.template_base.base_models import TemplateAttributeType
 from sinapsis_core.template_base.dynamic_template_factory import make_dynamic_template
 from sinapsis_core.utils.env_var_keys import SINAPSIS_BUILD_DOCS
 from torchmetrics import Metric
