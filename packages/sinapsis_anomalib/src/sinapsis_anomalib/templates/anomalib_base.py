@@ -13,7 +13,12 @@ from lightning.pytorch.loggers import Logger
 from pydantic import BaseModel, ConfigDict
 from pydantic.dataclasses import dataclass
 from sinapsis_core.data_containers.data_packet import DataContainer
-from sinapsis_core.template_base.base_models import TemplateAttributes, TemplateAttributeType
+from sinapsis_core.template_base.base_models import (
+    OutputTypes,
+    TemplateAttributes,
+    TemplateAttributeType,
+    UIPropertiesMetadata,
+)
 from sinapsis_core.template_base.dynamic_template import BaseDynamicWrapperTemplate, WrapperEntryConfig
 
 from sinapsis_anomalib.helpers.config_factory import CallbackFactory, LoggerFactory
@@ -149,7 +154,7 @@ class AnomalibBase(BaseDynamicWrapperTemplate):
 
     SUFFIX: str = "Wrapper"
     AttributesBaseModel = AnomalibBaseAttributes
-    CATEGORY = "Anomalib"
+    UIProperties = UIPropertiesMetadata(category="Anomalib", output_type=OutputTypes.IMAGE)
     WrapperEntry = DynamicWrapperEntry()
 
     def __init__(self, attributes: TemplateAttributeType) -> None:
