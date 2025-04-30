@@ -3734,7 +3734,7 @@ wheels = [
 
 [[package]]
 name = "sinapsis-anomalib"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "packages/sinapsis_anomalib" }
 dependencies = [
     { name = "anomalib" },
@@ -3820,7 +3820,7 @@ requires-dist = [
 
 [[package]]
 name = "sinapsis-anomaly-detection"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "." }
 dependencies = [
     { name = "sinapsis" },
