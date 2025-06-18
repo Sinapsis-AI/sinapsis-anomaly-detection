@@ -1,7 +1,7 @@
 services:
 
-  sinapsis-anolomaly-detection-main: &default
-    image: sinapsis-anolomaly-detection:base
+  sinapsis-anomaly-detection-main: &default
+    image: sinapsis-anomaly-detection:base
     build:
       context: ../
       dockerfile: docker/Dockerfile
