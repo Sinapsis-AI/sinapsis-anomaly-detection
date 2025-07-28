@@ -4,6 +4,7 @@ from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import Any, Protocol, TypeAlias
 
+import torch
 from anomalib import models as anomalib_models
 from anomalib.data import Folder
 from anomalib.engine import Engine
@@ -22,6 +23,7 @@ from sinapsis_core.template_base.base_models import (
 from sinapsis_core.template_base.dynamic_template import BaseDynamicWrapperTemplate, WrapperEntryConfig
 
 from sinapsis_anomalib.helpers.config_factory import CallbackFactory, LoggerFactory
+from sinapsis_anomalib.helpers.tags import Tags
 
 EXCLUDED_MODELS = [
     "EfficientAd",
@@ -154,7 +156,11 @@ class AnomalibBase(BaseDynamicWrapperTemplate):
 
     SUFFIX: str = "Wrapper"
     AttributesBaseModel = AnomalibBaseAttributes
-    UIProperties = UIPropertiesMetadata(category="Anomalib", output_type=OutputTypes.IMAGE)
+    UIProperties = UIPropertiesMetadata(
+        category="Anomalib",
+        output_type=OutputTypes.IMAGE,
+        tags=[Tags.ANOMALIB, Tags.ANOMALY_DETECTION, Tags.DYNAMIC, Tags.MODELS],
+    )
     WrapperEntry = DynamicWrapperEntry()
 
     def __init__(self, attributes: TemplateAttributeType) -> None:
@@ -215,3 +221,8 @@ class AnomalibBase(BaseDynamicWrapperTemplate):
         Returns:
             DataContainer: Processed data container
         """
+
+    def reset_state(self, template_name: str | None = None) -> None:
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        super().reset_state(template_name)

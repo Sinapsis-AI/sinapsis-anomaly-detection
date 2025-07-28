@@ -7,10 +7,14 @@ import torch
 import torchvision.transforms.v2 as T
 from anomalib.deploy import TorchInferencer
 
+from sinapsis_anomalib.helpers.tags import Tags
 from sinapsis_anomalib.templates.anomalib_base_inference import (
     AnomalibBaseInference,
     AnomalibInferenceAttributes,
 )
+
+AnomalibTorchInferenceUIProperties = AnomalibBaseInference.UIProperties
+AnomalibTorchInferenceUIProperties.tags.extend([Tags.PYTORCH])
 
 
 class AnomalibTorchInferenceAttributes(AnomalibInferenceAttributes):
@@ -46,6 +50,7 @@ class AnomalibTorchInference(AnomalibBaseInference):
     """
 
     AttributesBaseModel = AnomalibTorchInferenceAttributes
+    UIProperties = AnomalibTorchInferenceUIProperties
 
     def get_inferencer(self) -> TorchInferencer:
         """Get PyTorch Inferencer instance.

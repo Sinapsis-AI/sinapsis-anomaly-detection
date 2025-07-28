@@ -1,6 +1,6 @@
 [project]
 name = "sinapsis-anomaly-detection"
-version = "0.1.4"
+version = "0.1.5"
 description = "Packages to provide training, inference and export templates for computer vision anomaly detection models."
 authors = [
     {name = "SinapsisAI", email = "dev@sinapsis.tech"},
@@ -9,7 +9,7 @@ readme = "README.md"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
-   "sinapsis>=0.1.1",
+    "sinapsis>=0.2.19",
 ]
 
 

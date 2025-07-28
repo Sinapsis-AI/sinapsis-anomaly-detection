@@ -7,10 +7,14 @@ import numpy as np
 import torchvision.transforms.v2 as T
 from anomalib.deploy import OpenVINOInferencer
 
+from sinapsis_anomalib.helpers.tags import Tags
 from sinapsis_anomalib.templates.anomalib_base_inference import (
     AnomalibBaseInference,
     AnomalibInferenceAttributes,
 )
+
+AnomalibOpenVINOInferenceUIProperties = AnomalibBaseInference.UIProperties
+AnomalibOpenVINOInferenceUIProperties.tags.extend([Tags.OPENVINO])
 
 
 class AnomalibOpenVINOInferenceAttributes(AnomalibInferenceAttributes):
@@ -53,6 +57,7 @@ class AnomalibOpenVINOInference(AnomalibBaseInference):
     """
 
     AttributesBaseModel = AnomalibOpenVINOInferenceAttributes
+    UIProperties = AnomalibOpenVINOInferenceUIProperties
 
     def get_inferencer(self) -> OpenVINOInferencer:
         """Initialize OpenVINO inferencer with model and metadata.

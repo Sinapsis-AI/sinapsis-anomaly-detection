@@ -11,10 +11,14 @@ from sinapsis_core.template_base.base_models import TemplateAttributeType
 from sinapsis_core.template_base.dynamic_template_factory import make_dynamic_template
 from sinapsis_core.utils.env_var_keys import SINAPSIS_BUILD_DOCS
 
+from sinapsis_anomalib.helpers.tags import Tags
 from sinapsis_anomalib.templates.anomalib_base import (
     AnomalibBase,
     AnomalibBaseAttributes,
 )
+
+AnomalibTrainUIProperties = AnomalibBase.UIProperties
+AnomalibTrainUIProperties.tags.extend([Tags.TRAINING])
 
 
 @dataclass(frozen=True)
@@ -116,6 +120,7 @@ class AnomalibTrain(AnomalibBase):
 
     SUFFIX = "Train"
     AttributesBaseModel = AnomalibTrainAttributes
+    UIProperties = AnomalibTrainUIProperties
 
     def __init__(self, attributes: TemplateAttributeType) -> None:
         super().__init__(attributes)

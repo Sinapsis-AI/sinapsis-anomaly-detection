@@ -11,11 +11,15 @@ from sinapsis_core.template_base.dynamic_template_factory import make_dynamic_te
 from sinapsis_core.utils.env_var_keys import SINAPSIS_BUILD_DOCS
 from torchmetrics import Metric
 
+from sinapsis_anomalib.helpers.tags import Tags
 from sinapsis_anomalib.templates.anomalib_base import (
     AnomalibBase,
     AnomalibBaseAttributes,
 )
 from sinapsis_anomalib.templates.anomalib_train import AnomalibTrainDataClass
+
+AnomalibExportUIProperties = AnomalibBase.UIProperties
+AnomalibExportUIProperties.tags.extend([Tags.EXPORT])
 
 
 @dataclass(frozen=True, slots=True)
@@ -110,6 +114,7 @@ class AnomalibExport(AnomalibBase):
 
     AttributesBaseModel = AnomalibExportAttributes
     SUFFIX = "Export"
+    UIProperties = AnomalibExportUIProperties
 
     def __init__(self, attributes: TemplateAttributeType) -> None:
         super().__init__(attributes)
@@ -169,7 +174,7 @@ class AnomalibExport(AnomalibBase):
             ckpt_path=ckpt_path,
         )
 
-        return AnomalibExportDataClass(exported_model_path=exported_path)
+        return AnomalibExportDataClass(exported_model_path=str(exported_path))
 
     def execute(self, container: DataContainer) -> DataContainer:
         """Performs model export and stores results.

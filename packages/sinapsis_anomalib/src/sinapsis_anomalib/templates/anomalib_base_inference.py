@@ -23,6 +23,8 @@ from sinapsis_core.template_base.base_models import (
     UIPropertiesMetadata,
 )
 
+from sinapsis_anomalib.helpers.tags import Tags
+
 
 @dataclass(frozen=True)
 class AnomalibInferenceKeys:
@@ -63,7 +65,11 @@ class AnomalibBaseInference(Template):
     """
 
     AttributesBaseModel = AnomalibInferenceAttributes
-    UiProperties = UIPropertiesMetadata(category="Anomalib", output_type=OutputTypes.IMAGE)
+    UIProperties = UIPropertiesMetadata(
+        category="Anomalib",
+        output_type=OutputTypes.IMAGE,
+        tags=[Tags.ANOMALIB, Tags.ANOMALY_DETECTION, Tags.INFERENCE, Tags.MODELS],
+    )
 
     def __init__(self, attributes: TemplateAttributeType) -> None:
         super().__init__(attributes)
