@@ -26,10 +26,10 @@ templates:
       val_split_mode: "from_test"
       val_split_ratio: 0.5
       seed: 42
-    default_root_dir: "artifacts/train"
-    max_epochs: 5
-    accelerator: gpu
+    train_root: "train"
     trainer_args:
       devices: [0]
+      max_epochs: 5
+      accelerator: gpu
     cflow_init:
       lr: 0.0001
