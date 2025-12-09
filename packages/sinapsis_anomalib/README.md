@@ -71,7 +71,7 @@ _Export trained models for deployment in different formats._
 > [!TIP]
 > Use CLI command ```sinapsis info --example-template-config TEMPLATE_NAME``` to produce an example Agent config for the Template specified in ***TEMPLATE_NAME***.
 
-For example, for ***CfaTrain*** use ```sinapsis info --example-template-config CfaTrain``` to produce the following example config:
+For example, for ***CflowTrain*** use ```sinapsis info --example-template-config CflowTrain``` to produce the following example config:
 
 ```yaml
 agent:
@@ -80,30 +80,63 @@ templates:
 - template_name: InputTemplate
   class_name: InputTemplate
   attributes: {}
-- template_name: CfaTrain
-  class_name: CfaTrain
+- template_name: CflowTrain
+  class_name: CflowTrain
   template_input: InputTemplate
   attributes:
-    folder_attributes_config_path: null
-    generic_key: 'my_generic_key'
+    folder_attributes:
+      name: 'dataset'
+      root: null
+      normal_dir: 'images/normal'
+      abnormal_dir: null
+      normal_test_dir: null
+      mask_dir: null
+      normal_split_ratio: 0.2
+      extensions: null
+      train_batch_size: 32
+      eval_batch_size: 32
+      num_workers: 8
+      test_split_mode:
+      - from_dir
+      test_split_ratio: 0.2
+      val_split_mode:
+      - from_test
+      val_split_ratio: 0.5
+      seed: null
     callbacks: null
     normalization: null
     threshold: null
     image_metrics: null
     pixel_metrics: null
     logger: null
-    default_root_dir: null
     callback_configs: null
     logger_configs: null
-    max_epochs: null
     ckpt_path: null
-    cfa_init:
+    train_root: null
+    trainer_args:
+      devices: auto
+      accelerator: cpu
+      min_epochs: 1
+      max_epochs: 5
+    cflow_init:
       backbone: wide_resnet50_2
-      gamma_c: 1
-      gamma_d: 1
-      num_nearest_neighbors: 3
-      num_hard_negative_features: 3
-      radius: 1.0e-05
+      layers:
+      - layer2
+      - layer3
+      - layer4
+      pre_trained: true
+      fiber_batch_size: 64
+      decoder: freia-cflow
+      condition_vector: 128
+      coupling_blocks: 8
+      clamp_alpha: 1.9
+      permute_soft: false
+      lr: 0.0001
+      pre_processor: true
+      post_processor: true
+      evaluator: true
+      visualizer: true
+
 ```
 
 <details>
@@ -141,7 +174,7 @@ templates:
   class_name: CflowTrain
   attributes:
     folder_attributes_config_path: "configs/datamodule_config.yml"
-    default_root_dir: "results/model"
+    train_root: "model"
     max_epochs: 1
     cflow_init:
       lr: 0.0001

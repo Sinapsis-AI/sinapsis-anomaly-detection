@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 from anomalib.engine.engine import _TrainerArgumentsCache
 from pydantic import Field
@@ -11,6 +12,8 @@ from sinapsis_core.template_base.base_models import TemplateAttributeType
 from sinapsis_core.template_base.dynamic_template_factory import make_dynamic_template
 from sinapsis_core.utils.env_var_keys import SINAPSIS_BUILD_DOCS
 
+from sinapsis_anomalib.helpers.configs import TrainerConfig
+from sinapsis_anomalib.helpers.env_var_keys import ANOMALIB_ROOT_DIR
 from sinapsis_anomalib.helpers.tags import Tags
 from sinapsis_anomalib.templates.anomalib_base import (
     AnomalibBase,
@@ -59,20 +62,15 @@ class AnomalibTrainAttributes(AnomalibBaseAttributes):
     """Training-specific configuration attributes.
 
     Attributes:
-        max_epochs (int | None): Maximum number of training epochs.
-            If None, uses default from model configuration.
-        accelerator: (Literal["cpu", "gpu", "tpu", "hpu", "auto"]): Define the device to be used during training.
-            Defaults to "cpu".
         ckpt_path (str | Path | None): Path to checkpoint for resuming training.
             If None, starts training from scratch.
-        trainer_args: (dict[str, Any]): General trainer arguments. For more details see:
+        trainer_args: (TrainerConfig): General trainer arguments. For more details see:
             https://lightning.ai/docs/pytorch/stable/common/trainer.html#trainer-flags
     """
 
-    max_epochs: int | None = None
-    accelerator: Literal["cpu", "gpu", "tpu", "hpu", "auto"] = "cpu"
     ckpt_path: str | Path | None = None
-    trainer_args: dict[str, Any] = Field(default_factory=dict)
+    train_root: str | Path | None = None
+    trainer_args: TrainerConfig = Field(default_factory=TrainerConfig)
 
 
 class AnomalibTrain(AnomalibBase):
@@ -98,14 +96,13 @@ class AnomalibTrain(AnomalibBase):
             image_metrics: null
             pixel_metrics: null
             logger: null
-            default_root_dir: null
             callback_configs: null
             logger_configs: null
-            max_epochs: null
             ckpt_path: null
-            accelerator: gpu
             trainer_args:
                 devices: "0"
+                accelerator: gpu
+                max_epochs: null
             cfa_init:
                 backbone: wide_resnet50_2
                 gamma_c: 1
@@ -124,6 +121,8 @@ class AnomalibTrain(AnomalibBase):
 
     def __init__(self, attributes: TemplateAttributeType) -> None:
         super().__init__(attributes)
+        if self.attributes.folder_attributes is None:
+            raise ValueError("'folder_attributes' is required for training.")
         self.data_module = self.setup_data_loader()
 
     def _update_trainer_args(self) -> None:
@@ -132,11 +131,14 @@ class AnomalibTrain(AnomalibBase):
         Specifically sets the maximum number of training epochs
         based on the attributes configuration.
         """
+        train_dir = (
+            os.path.join(ANOMALIB_ROOT_DIR, self.attributes.train_root)
+            if self.attributes.train_root
+            else ANOMALIB_ROOT_DIR
+        )
         existing_args = self.engine._cache.args
-        existing_args[AnomalibTrainKeys.MAX_EPOCHS] = self.attributes.max_epochs
-
-        self.attributes.trainer_args[AnomalibTrainKeys.ACCELERATOR] = self.attributes.accelerator
-        existing_args.update(self.attributes.trainer_args)
+        existing_args["default_root_dir"] = train_dir
+        existing_args.update(self.attributes.trainer_args.model_dump(exclude_none=True))
         self.engine._cache = _TrainerArgumentsCache(**existing_args)
 
     def _get_training_metrics(self) -> dict[str, Any]:

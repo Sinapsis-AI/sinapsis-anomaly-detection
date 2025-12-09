@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
+import os
 from pathlib import Path
-from typing import Any
 
 from anomalib.deploy import CompressionType, ExportType
 from pydantic.dataclasses import dataclass
@@ -11,6 +11,8 @@ from sinapsis_core.template_base.dynamic_template_factory import make_dynamic_te
 from sinapsis_core.utils.env_var_keys import SINAPSIS_BUILD_DOCS
 from torchmetrics import Metric
 
+from sinapsis_anomalib.helpers.configs import OpenVINOArgs
+from sinapsis_anomalib.helpers.env_var_keys import ANOMALIB_ROOT_DIR
 from sinapsis_anomalib.helpers.tags import Tags
 from sinapsis_anomalib.templates.anomalib_base import (
     AnomalibBase,
@@ -48,12 +50,13 @@ class AnomalibExportAttributes(AnomalibBaseAttributes):
         generic_key_chkpt (str | None): Key to retrieve training results.
     """
 
+    folder_attributes: dict | None = None
     export_type: ExportType = ExportType.TORCH
     export_root: str | Path | None = None
     input_size: tuple[int, int] | None = None
     compression_type: CompressionType | None = None
     metric: Metric | str | None = None
-    ov_args: dict[str, Any] | None = None
+    ov_args: OpenVINOArgs | None = None
     ckpt_path: str | None = None
     generic_key_chkpt: str | None = None
 
@@ -82,7 +85,6 @@ class AnomalibExport(AnomalibBase):
             image_metrics: null
             pixel_metrics: null
             logger: null
-            default_root_dir: null
             callback_configs: null
             logger_configs: null
             export_type: 'openvino'
@@ -123,6 +125,11 @@ class AnomalibExport(AnomalibBase):
             CompressionType.INT8_ACQ,
             CompressionType.INT8_PTQ,
         ):
+            if self.attributes.folder_attributes is None:
+                raise ValueError(
+                    f"Compression type '{self.attributes.compression_type.value}' requires "
+                    "'folder_attributes' to be provided."
+                )
             self.data_module = self.setup_data_loader()
 
     def _get_checkpoint_path(self, container: DataContainer) -> str | Path:
@@ -148,7 +155,8 @@ class AnomalibExport(AnomalibBase):
         generic_data = self._get_generic_data(container, self.attributes.generic_key_chkpt)
         if generic_data and isinstance(generic_data, AnomalibTrainDataClass):
             return generic_data.checkpoint_path
-
+        if generic_data and isinstance(generic_data, dict):
+            return generic_data.get("checkpoint_path")
         raise ValueError("No checkpoint path found")
 
     def export_model(self, container: DataContainer) -> AnomalibExportDataClass:
@@ -161,16 +169,21 @@ class AnomalibExport(AnomalibBase):
             AnomalibExportDataClass: Contains exported model path
         """
         ckpt_path = self._get_checkpoint_path(container)
+        export_dir = (
+            os.path.join(ANOMALIB_ROOT_DIR, self.attributes.export_root)
+            if self.attributes.export_root
+            else ANOMALIB_ROOT_DIR
+        )
 
         exported_path = self.engine.export(
             model=self.model,
             export_type=self.attributes.export_type,
-            export_root=self.attributes.export_root,
+            export_root=export_dir,
             input_size=self.attributes.input_size,
             compression_type=self.attributes.compression_type,
             datamodule=self.data_module,
             metric=self.attributes.metric,
-            ov_args=self.attributes.ov_args,
+            ov_args=self.attributes.ov_args.model_dump(exclude_none=True) if self.attributes.ov_args else None,
             ckpt_path=ckpt_path,
         )
 

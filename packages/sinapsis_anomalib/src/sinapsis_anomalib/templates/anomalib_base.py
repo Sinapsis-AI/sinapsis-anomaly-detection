@@ -11,7 +11,7 @@ from anomalib.engine import Engine
 from anomalib.utils.types import NORMALIZATION, THRESHOLD
 from lightning.pytorch.callbacks import Callback
 from lightning.pytorch.loggers import Logger
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic.dataclasses import dataclass
 from sinapsis_core.data_containers.data_packet import DataContainer
 from sinapsis_core.template_base.base_models import (
@@ -23,6 +23,8 @@ from sinapsis_core.template_base.base_models import (
 from sinapsis_core.template_base.dynamic_template import BaseDynamicWrapperTemplate, WrapperEntryConfig
 
 from sinapsis_anomalib.helpers.config_factory import CallbackFactory, LoggerFactory
+from sinapsis_anomalib.helpers.configs import FolderConfig
+from sinapsis_anomalib.helpers.env_var_keys import ANOMALIB_ROOT_DIR
 from sinapsis_anomalib.helpers.tags import Tags
 
 EXCLUDED_MODELS = [
@@ -76,7 +78,7 @@ class EngineConfig(BaseModel):
     image_metrics: METRICS_TYPE | None = None
     pixel_metrics: METRICS_TYPE | None = None
     logger: LOGGER_TYPE = None
-    default_root_dir: PATH_TYPE = None
+    default_root_dir: PATH_TYPE = ANOMALIB_ROOT_DIR
     callback_configs: dict[str, dict[str, Any]] | None = None
     logger_configs: dict[str, dict[str, Any]] | None = None
 
@@ -117,7 +119,7 @@ class AnomalibBaseAttributes(TemplateAttributes):
     """Base attributes for Anomalib model templates.
 
     Attributes:
-        folder_attributes (dict[str, Any]): Configuration for Folder datamodule. Required for training, optional
+        folder_attributes (FolderConfig): Configuration for Folder datamodule. Required for training, optional
             for export.
         callbacks (list[Callback] | None): Lightning callbacks
         normalization (NORMALIZATION | None): Input normalization
@@ -125,19 +127,17 @@ class AnomalibBaseAttributes(TemplateAttributes):
         image_metrics (METRICS_TYPE | None): Image metrics
         pixel_metrics (METRICS_TYPE | None): Pixel metrics
         logger (LOGGER_TYPE): Lightning logger
-        default_root_dir (PATH_TYPE): Output directory
         callback_configs (dict[str, dict[str, Any]] | None): Callback configs
         logger_configs (dict[str, dict[str, Any]] | None): Logger configs
     """
 
-    folder_attributes: dict[str, Any] | None = None
+    folder_attributes: FolderConfig = Field(default_factory=FolderConfig)
     callbacks: list[Callback] | None = None
     normalization: NORMALIZATION | None = None
     threshold: THRESHOLD | None = None
     image_metrics: METRICS_TYPE | None = None
     pixel_metrics: METRICS_TYPE | None = None
     logger: LOGGER_TYPE = None
-    default_root_dir: PATH_TYPE = None
     callback_configs: dict[str, dict[str, Any]] | None = None
     logger_configs: dict[str, dict[str, Any]] | None = None
 
@@ -209,7 +209,9 @@ class AnomalibBase(BaseDynamicWrapperTemplate):
         Returns:
             Folder: Configured data module instance
         """
-        return Folder(**self.attributes.folder_attributes)
+        if self.attributes.folder_attributes is None:
+            raise ValueError("'folder_attributes' must be provided to set up the data loader.")
+        return Folder(**self.attributes.folder_attributes.model_dump(exclude_none=True))
 
     @abstractmethod
     def execute(self, container: DataContainer) -> DataContainer:
@@ -223,6 +225,11 @@ class AnomalibBase(BaseDynamicWrapperTemplate):
         """
 
     def reset_state(self, template_name: str | None = None) -> None:
+        """Re-instantiates the template.
+
+        Args:
+            template_name (str | None, optional): The name of the template instance being reset. Defaults to None.
+        """
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
         super().reset_state(template_name)
